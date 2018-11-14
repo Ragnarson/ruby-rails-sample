@@ -1,0 +1,19 @@
+pipeline:
+  build:
+    image: ruby:2.2.1
+    commands:
+      - bundle install
+      - bundle exec rake db:setup
+      - bundle exec bin/rspec
+    environment:
+      - RACK_ENV=test
+      - DATABASE_HOST=postgres://postgres@database/myapp_test
+  notify:
+    image: plugins/slack
+    secrets: [ slack_webhook ]
+    when:
+      status: [ success, failure ]
+
+services:
+  database:
+    image: postgres
